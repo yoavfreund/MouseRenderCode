@@ -6,13 +6,17 @@
 
 import vtk
 from vtk.util.misc import vtkGetDataRoot
-from vtk.util.colors import peacock, tomato
+from vtk.util.colors import peacock, tomato,green
 VTK_DATA_ROOT = vtkGetDataRoot()
 
 # First start by reading a cow model. We also generate surface normals for
 # prettier rendering.
-cow = vtk.vtkBYUReader()
-cow.SetGeometryFileName(VTK_DATA_ROOT + "/Data/Viewpoint/cow.g")
+cow = vtk.vtkBYUReader()   # Data Source
+cow.SetGeometryFileName("cow.g")
+
+print(cow)
+
+#Compute Normals
 cowNormals = vtk.vtkPolyDataNormals()
 cowNormals.SetInputConnection(cow.GetOutputPort())
 
@@ -20,24 +24,28 @@ cowNormals.SetInputConnection(cow.GetOutputPort())
 # the center of the cow model and oriented at an arbitrary angle.
 plane = vtk.vtkPlane()
 plane.SetOrigin(0.25, 0, 0)
-plane.SetNormal(-1, -1, 0)
+plane.SetNormal(0, 1, 0)
 
 # vtkClipPolyData requires an implicit function to define what it is to
 # clip with. Any implicit function, including complex boolean combinations
 # can be used. Notice that we can specify the value of the implicit function
 # with the SetValue method.
-clipper = vtk.vtkClipPolyData()
+clipper = vtk.vtkClipPolyData()    #clip filter ?
 clipper.SetInputConnection(cowNormals.GetOutputPort())
 clipper.SetClipFunction(plane)
 clipper.GenerateClipScalarsOn()
 clipper.GenerateClippedOutputOn()
 clipper.SetValue(0.5)
-clipMapper = vtk.vtkPolyDataMapper()
+
+#### Take stuff from here
+clipMapper = vtk.vtkPolyDataMapper()   # Mapper
 clipMapper.SetInputConnection(clipper.GetOutputPort())
 clipMapper.ScalarVisibilityOff()
+
 backProp = vtk.vtkProperty()
-backProp.SetDiffuseColor(tomato)
-clipActor = vtk.vtkActor()
+backProp.SetDiffuseColor(green)
+
+clipActor = vtk.vtkActor()      # Actor
 clipActor.SetMapper(clipMapper)
 clipActor.GetProperty().SetColor(peacock)
 clipActor.SetBackfaceProperty(backProp)
@@ -56,9 +64,11 @@ cutEdges.SetInputConnection(cowNormals.GetOutputPort())
 cutEdges.SetCutFunction(plane)
 cutEdges.GenerateCutScalarsOn()
 cutEdges.SetValue(0, 0.5)
+
 cutStrips = vtk.vtkStripper()
 cutStrips.SetInputConnection(cutEdges.GetOutputPort())
 cutStrips.Update()
+
 cutPoly = vtk.vtkPolyData()
 cutPoly.SetPoints(cutStrips.GetOutput().GetPoints())
 cutPoly.SetPolys(cutStrips.GetOutput().GetLines())
@@ -93,12 +103,16 @@ iren.SetRenderWindow(renWin)
 ren.AddActor(clipActor)
 ren.AddActor(cutActor)
 ren.AddActor(restActor)
+
+#### Add stuff up to here
+
 ren.SetBackground(1, 1, 1)
 ren.ResetCamera()
 ren.GetActiveCamera().Azimuth(30)
 ren.GetActiveCamera().Elevation(30)
 ren.GetActiveCamera().Dolly(1.5)
 ren.ResetCameraClippingRange()
+
 
 renWin.SetSize(300, 300)
 iren.Initialize()
