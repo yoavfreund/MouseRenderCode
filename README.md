@@ -6,4 +6,4 @@ To run the 3D viewer you need to
 * cd WorkingDemo
 * pythonw cutMusBrain.py
 
-### The 3D data is in the directory data.
+### The 3D data is in the S3 directory s3://
