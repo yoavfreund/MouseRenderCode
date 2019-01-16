@@ -6,4 +6,4 @@ To run the 3D viewer you need to
 * cd WorkingDemo
 * pythonw cutMusBrain.py
 
-### The 3D data is in the S3 directory s3://
+### The 3D data is in the S3 directory s3://mousebrainatlas-data/CSHL_volumes/atlasV7/atlasV7_10.0um_scoreVolume/score_volumes/
